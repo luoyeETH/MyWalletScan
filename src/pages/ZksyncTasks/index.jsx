@@ -624,7 +624,7 @@ function ZksyncTasks() {
               
                 return (
                   <a
-                    href={"https://explorer.zksync.io/address/" + record.address}
+                    href={"https://era.zksync.network/" + record.address}
                     target={"_blank"}
                     style={{ color: textColor }}
                   >
