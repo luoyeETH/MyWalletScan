@@ -56,7 +56,7 @@ async function getBaseTx(address, apiKey) {
         let weeks = new Set();
         let months = new Set();
         address = address.toLowerCase();
-        let url = `https://api.basescan.org/api?module=account&action=txlist&address=${address}&startblock=0&endblock=9999999999&page=1&offset=9999&sort=asc&apikey=${apiKey}`;
+        let url = `https://api.basescan.org/api?module=account&action=txlist&address=${address}&startblock=0&endblock=9999999999&page=1&offset=4999&sort=asc&apikey=${apiKey}`;
         const response = await axios.get(url);
         let transactions = response.data.result;
         transactions = transactions.filter(item => item.from === address);
