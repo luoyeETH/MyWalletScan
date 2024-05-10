@@ -3,7 +3,7 @@ import axios from 'axios';
 const RPC_MAP = {
     "ethereum": [
         // "https://cloudflare-eth.com",
-        "https://eth.llamarpc.com",
+        // "https://eth.llamarpc.com",
         "https://rpc.ankr.com/eth",
         "https://1rpc.io/eth",
         "https://eth.rpc.blxrbdn.com",
