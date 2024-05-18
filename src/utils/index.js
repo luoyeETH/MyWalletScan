@@ -33,6 +33,7 @@ import getScrollERC20 from "@utils/scroll/getScrollERC20.js";
 import getScrollBridge from "@utils/scroll/getScrollBridge.js";
 import getStarkId from "@utils/stark/getStarkId.js";
 import getStarkAirdrop from "@utils/stark/getStarkAirdrop.js";
+import checkSybil from "@utils/layer/checkSybil.js";
 export {
     getEthBalance,
     getTxCount,
@@ -68,5 +69,6 @@ export {
     getScrollERC20,
     getScrollBridge,
     getStarkId,
-    getStarkAirdrop
+    getStarkAirdrop,
+    checkSybil,
 };

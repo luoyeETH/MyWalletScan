@@ -11,7 +11,7 @@ import {
     Popconfirm,
     Row, Col, InputNumber, Badge, message, Switch, Pagination
 } from 'antd';
-import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons"
+import { EyeOutlined, EyeInvisibleOutlined, FileSearchOutlined } from "@ant-design/icons"
 import {
     getEthBalance,
     getTxCount,
@@ -20,7 +20,8 @@ import {
     getZkSyncBridge,
     exportToExcel,
     calculateScore,
-    getDebankValue
+    getDebankValue,
+    checkSybil
 } from "@utils"
 import {useEffect, useState} from "react";
 import './index.css';
@@ -382,6 +383,39 @@ function Zksync() {
             form.resetFields();
         }
     }
+    const handleCheck = async () => {
+        if (!selectedKeys.length) {
+            notification.error({
+                message: "错误",
+                description: "请先选择要查询的地址",
+            }, 2);
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const newData = [...data];
+            for (let key of selectedKeys) {
+                const index = newData.findIndex(item => item.key === key);
+                if (index !== -1) {
+                    const item = newData[index];
+                    item.sybil = false;
+                    setData([...newData]);
+                    const { sybil } = await checkSybil(item.address);
+                    item.sybil = sybil;
+                    setData([...newData]);
+                    localStorage.setItem('addresses', JSON.stringify(data));
+                }
+            }
+        } catch (error) {
+            notification.error({
+                message: "错误",
+                description: error.message,
+            }, 2);
+        } finally {
+            setIsLoading(false);
+            setSelectedKeys([]);
+        }
+    };
     const handleRefresh = async () => {
         if (!selectedKeys.length) {
             notification.error({
@@ -802,7 +836,8 @@ function Zksync() {
                 if (hideColumn) {
                     return '***';
                   }
-                return isRowSatisfyCondition(record) ?
+                return record.sybil ? <span style={{ color: 'red' }} dangerouslySetInnerHTML={{ __html: `${text}💥` }}></span> : 
+                 isRowSatisfyCondition(record) ?
                     <div
                         style={{backgroundColor: '#bbeefa', borderRadius: '5px'}}
                     >
@@ -1385,15 +1420,20 @@ function Zksync() {
                                 }}>
                                     <Button type="primary" onClick={handleRefresh} loading={isLoading}
                                             size={"large"}
-                                            style={{width: "20%"}} icon={<SyncOutlined/>}>
+                                            style={{width: "15%"}} icon={<SyncOutlined/>}>
                                         {isLoading ? "正在刷新" : "刷新选中地址"}
+                                    </Button>
+                                    <Button type="primary" danger onClick={handleCheck} loading={isLoading} size={"large"}
+                                                style={{width: "15%"}}
+                                                icon={<FileSearchOutlined />}>
+                                            查询女巫(非本地)
                                     </Button>
                                     <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}
                                             icon={<PlusOutlined/>}>
                                         添加地址
                                     </Button>
                                     <Button type="primary" onClick={showBatchModal} size={"large"}
-                                            style={{width: "20%"}}
+                                            style={{width: "15%"}}
                                             icon={<UploadOutlined/>}
                                             loading={batchloading}
                                     >
@@ -1401,14 +1441,14 @@ function Zksync() {
                                     </Button>
                                     <Button type="primary" onClick={() => {
                                         setIsWalletModalVisible(true)
-                                    }} size={"large"} style={{width: "20%"}}
+                                    }} size={"large"} style={{width: "15%"}}
                                             icon={<SettingOutlined/>}>
                                         配置
                                     </Button>
                                     <Popconfirm title={"确认删除" + selectedKeys.length + "个地址？"}
                                                 onConfirm={handleDeleteSelected}>
                                         <Button type="primary" danger size={"large"}
-                                                style={{width: "20%"}} icon={<DeleteOutlined/>}>
+                                                style={{width: "15%"}} icon={<DeleteOutlined/>}>
                                             删除选中地址
                                         </Button>
                                     </Popconfirm>
