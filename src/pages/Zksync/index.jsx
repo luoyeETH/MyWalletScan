@@ -1317,8 +1317,7 @@ function Zksync() {
                 </Modal>
                 <Spin spinning={tableLoading}>
                     <div style={{ width: '100%', margin: "0 auto" }}>
-                    <span className="highlight-text">zkSync大概率已经完成快照 7月空投 别卷了xdm <a href="https://x.com/zksync/status/1791488199715348727">点击查看原文</a>
-                        <br/>ZK summer is coming.
+                    <span className="highlight-text">ZK is the Endgame.
                     </span>
                 </div>
                     <Table

@@ -56,7 +56,7 @@ async function getScrollTx(address) {
         let weeks = new Set();
         let months = new Set();
         address = address.toLowerCase();
-        let url = `https://api.scrollscan.com/api?module=account&action=txlist&address=${address}&startblock=0&endblock=9999999999&page=1&offset=9999&sort=asc`;
+        let url = `https://api.scrollscan.com/api?module=account&action=txlist&address=${address}&startblock=0&endblock=9999999999&page=1&offset=999&sort=asc`;
         const response = await axios.get(url);
         let transactions = response.data.result;
         transactions = transactions.filter(item => item.from === address);
