@@ -827,24 +827,80 @@ function Zksync() {
                     <span onClick={toggleHideColumn} style={{ marginLeft: 8, cursor: 'pointer' }}>
                         {getEyeIcon()}
                     </span>
+                    <a 
+                        onClick={() => {
+                            const addresses = data.map(item => item.address).join('\n');
+                            navigator.clipboard.writeText(addresses);
+                            message.success('地址已复制');
+                        }} 
+                        style={{ marginLeft: 8, cursor: 'pointer' }}
+                    >
+                        复制全部
+                    </a>
                 </span>
             ),
             dataIndex: "address",
             key: "address",
             align: "center",
             render: (text, record) => {
+                const [ensData, setEnsData] = useState(null);
+
+                useEffect(() => {
+                    if (record.ens) {
+                        setEnsData(record.ens);
+                    } else {
+                        const fetchENS = async (address) => {
+                            try {
+                                const response = await fetch(`https://api.ensideas.com/ens/resolve/${address}`);
+                                const data = await response.json();
+                                setEnsData(data);
+                                if (data) {
+                                    record.ens = data;
+                                }
+                            } catch (error) {
+                                console.error("Error fetching ENS:", error);
+                                setEnsData(null);
+                            }
+                        };
+
+                        fetchENS(record.address);
+                    }
+                }, [record.address]);
+
                 if (hideColumn) {
                     return '***';
-                  }
-                return record.sybil ? <span style={{ color: 'red' }} dangerouslySetInnerHTML={{ __html: `${text}💥` }}></span> : 
-                 isRowSatisfyCondition(record) ?
-                    <div
-                        style={{backgroundColor: '#bbeefa', borderRadius: '5px'}}
+                }
+
+                const displayText = ensData ? ensData.displayName : text;
+
+                return record.sybil ? (
+                    <span 
+                        style={{ color: 'red' }} 
+                        dangerouslySetInnerHTML={{ __html: `${displayText}💥` }} 
+                        title={record.address}
+                        onMouseEnter={(e) => e.target.innerHTML = `${displayText} (${record.address})💥`}
+                        onMouseLeave={(e) => e.target.innerHTML = `${displayText}💥`}
+                    ></span>
+                ) : isRowSatisfyCondition(record) ? (
+                    <div 
+                        style={{ backgroundColor: '#bbeefa', borderRadius: '5px' }} 
+                        title={record.address}
+                        onMouseEnter={(e) => e.target.innerHTML = `${displayText} (${record.address})`}
+                        onMouseLeave={(e) => e.target.innerHTML = displayText}
                     >
-                        {text}</div> : text ||
-                    <Spin/>;
+                        {displayText}
+                    </div>
+                ) : (
+                    <span 
+                        title={record.address}
+                        onMouseEnter={(e) => e.target.innerHTML = `${displayText} (${record.address})`}
+                        onMouseLeave={(e) => e.target.innerHTML = displayText}
+                    >
+                        {displayText || <Spin />}
+                    </span>
+                );
             },
-            width: 168
+            width: 85
         },
         // {
         //     title: "余额",

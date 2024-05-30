@@ -185,6 +185,9 @@ function BaseTasks() {
                     const item = newData[index];
                     const taskContractsMap = new Map();
                     const result = await getBaseTasks(item.address, apiKey);
+                    if (result[0].includes("Error")) {
+                        continue;
+                    }
                     const contractAddresses = result[0];
                     taskContractsMap.set(item.address, contractAddresses);
                     setTaskContracts(taskContractsMap);
@@ -339,6 +342,9 @@ function BaseTasks() {
               const address = entry.address;
               const promise = getBaseTasks(address, apiKey)
                 .then(result => {
+                    if(result[0].includes("Error")) {
+                        return;
+                    }
                     taskContractsMap.set(address, result[0]);
                     timestampsArray.push(result[1]);
                 })
@@ -437,14 +443,50 @@ function BaseTasks() {
             dataIndex: "address",
             key: "address",
             align: "center",
-            render: (text) => {
+            render: (text, record) => {
+                const [ensData, setEnsData] = useState(null);
+
+                useEffect(() => {
+                    if (record.ens) {
+                        setEnsData(record.ens);
+                    } else {
+                        const fetchENS = async (address) => {
+                            try {
+                                const response = await fetch(`https://api.ensideas.com/ens/resolve/${address}`);
+                                const data = await response.json();
+                                setEnsData(data);
+                                if (data) {
+                                    record.ens = data;
+                                }
+                            } catch (error) {
+                                console.error("Error fetching ENS:", error);
+                                setEnsData(null);
+                            }
+                        };
+
+                        fetchENS(record.address);
+                    }
+                }, [record.address]);
+
                 if (hideColumn) {
-                  return '***';
+                    return '***';
                 }
-                return text;
-              },
-            width: 200
-        },{
+
+                const displayText = ensData ? ensData.displayName : text;
+
+                return (
+                    <span 
+                        title={record.address}
+                        onMouseEnter={(e) => e.target.innerHTML = `${displayText} (${record.address})`}
+                        onMouseLeave={(e) => e.target.innerHTML = displayText}
+                    >
+                        {displayText}
+                    </span>
+                );
+            },
+            width: 85
+        },
+        {
             title: "最后交易",
             dataIndex: "base_last_tx",
             key: "base_last_tx",

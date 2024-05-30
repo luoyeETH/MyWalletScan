@@ -18,6 +18,9 @@ function getMonthNumber(d) {
 }
 
 function getZkSyncLastTX(lastTxDatetime) {
+    if (lastTxDatetime === undefined) {
+        return "无交易"
+    }
     const date = new Date(lastTxDatetime);
     const offset = 8;
     const utc8Date = new Date(date.getTime() + offset * 3600 * 1000);
@@ -49,7 +52,6 @@ const getEthPrice = async () => {
     }
 
 }
-
 async function getLineaTx(address, apiKey) {
     try {
         let days = new Set();
@@ -59,6 +61,9 @@ async function getLineaTx(address, apiKey) {
         let url = `https://api.lineascan.build/api?module=account&action=txlist&address=${address}&startblock=1&endblock=99999999&sort=asc&apikey=${apiKey}`;
         const response = await axios.get(url);
         let transactions = response.data.result;
+        if (!Array.isArray(transactions)) {
+            throw new TypeError("Expected an array of transactions, but did not receive one.");
+        }
         transactions = transactions.filter(item => item.from === address);
         let contractAddresses = transactions.map(item => item.to);
         contractAddresses = [...new Set(contractAddresses)];
@@ -70,18 +75,16 @@ async function getLineaTx(address, apiKey) {
             months.add(getMonthNumber(item));
         });
         const fee = transactions.reduce((acc, item) => acc + parseFloat(item.gasPrice) * parseFloat(item.gasUsed), 0);
-        // debugger
         const feeEth = fee / 10 ** 18;
         const exchangeAmount = transactions.reduce((acc, item) => acc + parseFloat(ethers.formatEther(item.value)), 0);
         const ethPrice = await getEthPrice();
-        const toytalExchangeAmount = exchangeAmount * ethPrice;
+        const totalExchangeAmount = exchangeAmount * ethPrice;
         const tx = transactions.length;
         const linea_last_tx = getZkSyncLastTX(lastTxDatetime);
         const dayActivity = days.size;
         const weekActivity = weeks.size;
         const monthActivity = months.size;
         const contractActivity = contractAddresses.length;
-        // console.log(tx, linea_last_tx, feeEth, dayActivity, weekActivity, monthActivity, contractActivity);
         return {
             linea_tx_amount: tx,
             linea_last_tx: linea_last_tx, 
@@ -90,7 +93,7 @@ async function getLineaTx(address, apiKey) {
             monthActivity: monthActivity, 
             contractActivity: contractActivity, 
             totalFee: parseFloat(feeEth).toFixed(4),
-            totalExchangeAmount: parseFloat(toytalExchangeAmount).toFixed(2),
+            totalExchangeAmount: parseFloat(totalExchangeAmount).toFixed(2),
         };
     } catch (error) {
         console.error(error);

@@ -445,7 +445,7 @@ function ZksyncTasks() {
             message.info("等待数据加载完成再刷新");
             return "error";
         }
-        const count = contractAddresses.reduce((accumulator, contractAddress) => {
+        const count = contractAddresses?.reduce((accumulator, contractAddress) => {
             if (contractAddress === taskContract) {
               return accumulator + 1;
             }
@@ -457,7 +457,7 @@ function ZksyncTasks() {
 
     const checkTaskStatusByArray = (contractAddresses, taskContract) => {
         taskContract = taskContract.toLowerCase();
-        const count = contractAddresses.reduce((accumulator, contractAddress) => {
+        const count = contractAddresses?.reduce((accumulator, contractAddress) => {
             if (contractAddress === taskContract) {
                 return accumulator + 1;
               }
@@ -599,14 +599,50 @@ function ZksyncTasks() {
             dataIndex: "address",
             key: "address",
             align: "center",
-            render: (text) => {
+            render: (text, record) => {
+                const [ensData, setEnsData] = useState(null);
+
+                useEffect(() => {
+                    if (record.ens) {
+                        setEnsData(record.ens);
+                    } else {
+                        const fetchENS = async (address) => {
+                            try {
+                                const response = await fetch(`https://api.ensideas.com/ens/resolve/${address}`);
+                                const data = await response.json();
+                                setEnsData(data);
+                                if (data) {
+                                    record.ens = data;
+                                }
+                            } catch (error) {
+                                console.error("Error fetching ENS:", error);
+                                setEnsData(null);
+                            }
+                        };
+
+                        fetchENS(record.address);
+                    }
+                }, [record.address]);
+
                 if (hideColumn) {
-                  return '***';
+                    return '***';
                 }
-                return text;
-              },
-            width: 150
-        },{
+
+                const displayText = ensData ? ensData.displayName : text;
+
+                return (
+                    <span 
+                        title={record.address}
+                        onMouseEnter={(e) => e.target.innerHTML = `${displayText} (${record.address})`}
+                        onMouseLeave={(e) => e.target.innerHTML = displayText}
+                    >
+                        {displayText}
+                    </span>
+                );
+            },
+            width: 85
+        },
+        {
             title: "最后交易",
             dataIndex: "zks2_last_tx",
             key: "zks2_last_tx",
