@@ -72,26 +72,23 @@ const Overview = () => {
     const [ethPrice, setEthPrice] = useState(0);
 
     const zksAddresses = localStorage.getItem('addresses');
-    const starkAddresses = localStorage.getItem('stark_addresses');
     const l0Addresses = localStorage.getItem('l0_addresses');
     const lineaAddresses = localStorage.getItem('linea_addresses');
     const baseAddresses = localStorage.getItem('base_addresses');
     const scrollAddresses = localStorage.getItem('scroll_addresses');
 
     const zksAddressList = zksAddresses ? JSON.parse(zksAddresses) : [];
-    const starkAddressList = starkAddresses ? JSON.parse(starkAddresses) : [];
     const l0AddressList = l0Addresses ? JSON.parse(l0Addresses) : [];
     const lineaAddressList = lineaAddresses ? JSON.parse(lineaAddresses) : [];
     const baseAddressList = baseAddresses ? JSON.parse(baseAddresses) : [];
     const scrollAddressList = scrollAddresses ? JSON.parse(scrollAddresses) : [];
 
     const zksAddressCount = zksAddressList.length;
-    const starkAddressCount = starkAddressList.length;
     const l0AddressCount = l0AddressList.length;
     const lineaAddressCount = lineaAddressList.length;
     const baseAddressCount = baseAddressList.length;
     const scrollAddressCount = scrollAddressList.length;
-    const accountCount = zksAddressCount + starkAddressCount + l0AddressCount + lineaAddressCount + baseAddressCount + scrollAddressCount;
+    const accountCount = zksAddressCount + l0AddressCount + lineaAddressCount + baseAddressCount + scrollAddressCount;
     const accountOption = {
         title : {
             text: '账号总览',
@@ -134,7 +131,6 @@ const Overview = () => {
             },
             data: [
               { value: zksAddressCount, name: 'zkSync Era' },
-              { value: starkAddressCount, name: 'StarkNet' },
               { value: l0AddressCount, name: 'LayerZero' },
               { value: lineaAddressCount, name: 'Linea' },
               { value: baseAddressCount, name: 'Base' },
@@ -145,127 +141,63 @@ const Overview = () => {
       };
     
     const totalzksEthBalance = zksAddressList.reduce((total, addressData) => {
-    if ('eth_balance' in addressData) {
-        const ethBalance = parseFloat(addressData.eth_balance);
-        return total + ethBalance;
-    }
-        return total;
+        const ethBalance = parseFloat(addressData.eth_balance || 0);
+        return total + (isNaN(ethBalance) ? 0 : ethBalance);
     }, 0);
     const totalzks1Balance = zksAddressList.reduce((total, addressData) => {
-        if ('zks1_balance' in addressData) {
-            const zks1_balance = parseFloat(addressData.zks1_balance);
-            return total + zks1_balance;
-        }
-            return total;
+        const zks1_balance = parseFloat(addressData.zks1_balance || 0);
+        return total + (isNaN(zks1_balance) ? 0 : zks1_balance);
     }, 0);
     const totalzks2Balance = zksAddressList.reduce((total, addressData) => {
-        if ('zks2_balance' in addressData) {
-            const zks2_balance = parseFloat(addressData.zks2_balance);
-            return total + zks2_balance;
-        }
-            return total;
+        const zks2_balance = parseFloat(addressData.zks2_balance || 0);
+        return total + (isNaN(zks2_balance) ? 0 : zks2_balance);
     }, 0);
     const totalzks2UsdcBalance = zksAddressList.reduce((total, addressData) => {
-        if ('zks2_usdcBalance' in addressData) {
-            const zks2_usdcBalance = parseFloat(addressData.zks2_usdcBalance);
-            return total + zks2_usdcBalance;
-        }
-            return total;
-    }, 0);
-    const totalstarkEthBalance = starkAddressList.reduce((total, addressData) => {
-        if ('stark_eth_balance' in addressData) {
-            const stark_eth_balance = parseFloat(addressData.stark_eth_balance);
-            return total + stark_eth_balance;
-        }
-            return total;
-    }, 0);
-    const totalstarkUsdcBalance = starkAddressList.reduce((total, addressData) => {
-        if ('stark_usdc_balance' in addressData) {
-            const stark_usdc_balance = parseFloat(addressData.stark_usdc_balance);
-            return total + stark_usdc_balance;
-        }
-            return total;
-    }, 0);
-    const totalstarkUsdtBalance = starkAddressList.reduce((total, addressData) => {
-        if ('stark_usdt_balance' in addressData) {
-            const stark_usdt_balance = parseFloat(addressData.stark_usdt_balance);
-            return total + stark_usdt_balance;
-        }
-            return total;
-    }, 0);
-    const totalstarkDaiBalance = starkAddressList.reduce((total, addressData) => {
-        if ('stark_eth_balance' in addressData) {
-            const stark_eth_balance = parseFloat(addressData.stark_eth_balance);
-            return total + stark_eth_balance;
-        }
-            return total;
+        const zks2_usdcBalance = parseFloat(addressData.zks2_usdcBalance || 0);
+        return total + (isNaN(zks2_usdcBalance) ? 0 : zks2_usdcBalance);
     }, 0);
     const totallineaEthBalance = lineaAddressList.reduce((total, addressData) => {
-        if ('linea_eth_balance' in addressData) {
-            const linea_eth_balance = parseFloat(addressData.linea_eth_balance);
-            return total + linea_eth_balance;
-        }
-            return total;
+        const linea_eth_balance = parseFloat(addressData.linea_eth_balance || 0);
+        return total + (isNaN(linea_eth_balance) ? 0 : linea_eth_balance);
     }, 0);
     const totallineaBusdBalance = lineaAddressList.reduce((total, addressData) => {
-        if ('linea_busd_balance' in addressData) {
-            const linea_busd_balance = parseFloat(addressData.linea_busd_balance);
-            return total + linea_busd_balance;
-        }
-            return total;
+        const linea_busd_balance = parseFloat(addressData.linea_busd_balance || 0);
+        return total + (isNaN(linea_busd_balance) ? 0 : linea_busd_balance);
     }, 0);
     const totallineaUsdcBalance = lineaAddressList.reduce((total, addressData) => {
-        if ('linea_usdc_balance' in addressData) {
-            const linea_usdc_balance = parseFloat(addressData.linea_usdc_balance);
-            return total + linea_usdc_balance;
-        }
-            return total;
+        const linea_usdc_balance = parseFloat(addressData.linea_usdc_balance || 0);
+        return total + (isNaN(linea_usdc_balance) ? 0 : linea_usdc_balance);
     }, 0);
     const totalbaseEthBalance = baseAddressList.reduce((total, addressData) => {
-        if ('base_eth_balance' in addressData) {
-            const base_eth_balance = parseFloat(addressData.base_eth_balance);
-            return total + base_eth_balance;
-        }
-            return total;
+        const base_eth_balance = parseFloat(addressData.base_eth_balance || 0);
+        return total + (isNaN(base_eth_balance) ? 0 : base_eth_balance);
     }, 0);
     const totalbaseUsdcBalance = baseAddressList.reduce((total, addressData) => {
-        if ('base_usdc_balance' in addressData) {
-            const base_usdc_balance = parseFloat(addressData.base_usdc_balance);
-            return total + base_usdc_balance;
-        }
-            return total;
+        const base_usdc_balance = parseFloat(addressData.base_usdc_balance || 0);
+        return total + (isNaN(base_usdc_balance) ? 0 : base_usdc_balance);
     }, 0);
     const totalscrollEthBalance = scrollAddressList.reduce((total, addressData) => {
-        if ('scroll_eth_balance' in addressData) {
-            const scroll_eth_balance = parseFloat(addressData.scroll_eth_balance);
-            return total + scroll_eth_balance;
-        }
-            return total;
+        const scroll_eth_balance = parseFloat(addressData.scroll_eth_balance || 0);
+        return total + (isNaN(scroll_eth_balance) ? 0 : scroll_eth_balance);
     }, 0);
     const totalscrollUsdcBalance = scrollAddressList.reduce((total, addressData) => {
-        if ('scroll_usdc_balance' in addressData) {
-            const scroll_usdc_balance = parseFloat(addressData.scroll_usdc_balance);
-            return total + scroll_usdc_balance;
-        }
-            return total;
+        const scroll_usdc_balance = parseFloat(addressData.scroll_usdc_balance || 0);
+        return total + (isNaN(scroll_usdc_balance) ? 0 : scroll_usdc_balance);
     }, 0);
     const totalscrollUsdtBalance = scrollAddressList.reduce((total, addressData) => {
-        if ('scroll_usdt_balance' in addressData) {
-            const scroll_usdt_balance = parseFloat(addressData.scroll_usdt_balance);
-            return total + scroll_usdt_balance;
-        }
-            return total;
+        const scroll_usdt_balance = parseFloat(addressData.scroll_usdt_balance || 0);
+        return total + (isNaN(scroll_usdt_balance) ? 0 : scroll_usdt_balance);
     }, 0);
-    const totalEth = parseFloat(totalzksEthBalance + totalzks1Balance + totalzks2Balance + totalstarkEthBalance + totallineaEthBalance + totalbaseEthBalance + totalbaseEthBalance).toFixed(2);
-    const totalUsdc = parseFloat(totalzks2UsdcBalance + totalstarkUsdcBalance + totallineaUsdcBalance + totalbaseUsdcBalance + totalbaseUsdcBalance).toFixed(2);
-    const totalUsdt = parseFloat(totalstarkUsdtBalance + totalscrollUsdtBalance).toFixed(2);
-    const totalDai = parseFloat(totalstarkDaiBalance).toFixed(2);
+    const totalEth = parseFloat(totalzksEthBalance + totalzks1Balance + totalzks2Balance + totallineaEthBalance + totalbaseEthBalance);
+    const totalUsdc = parseFloat(totalzks2UsdcBalance + totallineaUsdcBalance + totalbaseUsdcBalance).toFixed(2);
+    const totalUsdt = parseFloat(totalscrollUsdtBalance).toFixed(2);
+    const totalDai = parseFloat(0).toFixed(2);
     const totalBusd = parseFloat(totallineaBusdBalance).toFixed(2);
     const totalBalance = parseFloat(Number(totalEth) * ethPrice + Number(totalUsdc) + Number(totalUsdt) + Number(totalDai) + Number(totalBusd)).toFixed(2);
     const valueOption = {
     title : {
         text: '资产总览',
-        subtext: `资产总额 ${totalBalance}U L2资产总额 ${parseInt(Number(totalBalance) - Number(totalzksEthBalance) * ethPrice)}U\n\nETH(${totalEth}) 稳定币(${parseInt(Number(totalzks2UsdcBalance) + Number(totalstarkUsdcBalance) + Number(totalstarkUsdtBalance) + Number(totalstarkDaiBalance) + Number(totallineaBusdBalance) + Number(totallineaUsdcBalance))})`,
+        subtext: `资产总额 ${totalBalance}U L2资产总额 ${parseInt(Number(totalBalance) - Number(totalzksEthBalance) * ethPrice)}U\n\nETH(${totalEth}) 稳定币(${parseInt(Number(totalzks2UsdcBalance) + Number(totalUsdc) + Number(totalUsdt) + Number(totalDai) + Number(totallineaBusdBalance) + Number(totallineaUsdcBalance))})`,
         x:'center'
         },
     tooltip: {
@@ -346,7 +278,6 @@ const Overview = () => {
             { value: parseInt(totalzksEthBalance * ethPrice), name: 'Ethereum' },
             { value: parseInt(totalzks2Balance * ethPrice + totalzks2UsdcBalance), name: 'zkSync Era' },
             { value: parseInt(totalzks1Balance * ethPrice), name: 'zkSync Lite' },
-            { value: parseInt(totalstarkEthBalance * ethPrice + totalstarkUsdcBalance + totalstarkUsdtBalance + totalstarkDaiBalance), name: 'StarkNet' },
             { value: parseInt(totallineaEthBalance * ethPrice + totallineaBusdBalance + totallineaUsdcBalance), name: 'Linea' },
             { value: parseInt(totalbaseEthBalance * ethPrice ), name: 'Base' },
             { value: parseInt(totalscrollEthBalance * ethPrice + totalscrollUsdcBalance + totalscrollUsdtBalance), name: 'Scroll' },
@@ -355,6 +286,7 @@ const Overview = () => {
     ]
     };
     const zksProgress = zksAddressList.reduce((acc, entry) => {
+        console.log("zksp=",entry['progress'], entry)
         if ('progress' in entry) {
             acc.push(entry.progress);
         }
@@ -395,48 +327,8 @@ const Overview = () => {
         '80-90': 0,
         '90-100': 0
       });
-    const starkProgress = starkAddressList.reduce((acc, entry) => {
-        if ('progress' in entry) {
-            acc.push(entry.progress);
-        }
-        return acc;
-    }, []);
-    const starkProgressIntervalCounts = starkProgress.reduce((acc, num) => {
-        if (num >= 0 && num <= 10) {
-            acc['0-10']++;
-        } else if (num > 10 && num <= 20) {
-            acc['10-20']++;
-        } else if (num > 20 && num <= 30) {
-            acc['20-30']++;
-        } else if (num > 30 && num <= 40) {
-            acc['30-40']++;
-        } else if (num > 40 && num <= 50) {
-            acc['40-50']++;
-        } else if (num > 50 && num <= 60) {
-            acc['50-60']++;
-        } else if (num > 60 && num <= 70) {
-            acc['60-70']++;
-        } else if (num > 70 && num <= 80) {
-            acc['70-80']++;
-        } else if (num > 80 && num <= 90) {
-            acc['80-90']++;
-        } else if (num > 90 && num <= 100) {
-            acc['90-100']++;
-        }
-        return acc;
-      }, {
-        '0-10': 0,
-        '10-20': 0,
-        '20-30': 0,
-        '30-40': 0,
-        '40-50': 0,
-        '50-60': 0,
-        '60-70': 0,
-        '70-80': 0,
-        '80-90': 0,
-        '90-100': 0
-      });
     const lineaProgress = lineaAddressList.reduce((acc, entry) => {
+        console.log("lineap=",entry['progress'])
         if ('progress' in entry) {
             acc.push(entry.progress);
         }
@@ -477,60 +369,14 @@ const Overview = () => {
         '80-90': 0,
         '90-100': 0
       });
-    const progressOption = {
-        title: {
-            text: '任务进度分布',
-            subtext: `zkSyncEra平均完成率 ${parseInt(zksProgress.reduce((acc, num) => acc + parseFloat(num), 0) / zksProgress.length)}%  StarkNet平均完成率 ${parseInt(starkProgress.reduce((acc, num) => acc + parseFloat(num), 0) / starkProgress.length)}% Linea平均完成率 ${parseInt(lineaProgress.reduce((acc, num) => acc + parseFloat(num), 0) / lineaProgress.length)}%`,
-            left: 'center'
-        },
-        tooltip: {
-            trigger: 'item',
-            formatter: "{a} <br/>{b} : {c}"
-        },
-        legend: {
-            top: '1%',
-            orient: 'vertical',
-            left: 'left',
-            data: ['zkSync Era', 'StarkNet', 'Linea']
-        },
-        xAxis: {
-          type: 'category',
-          data: ['0-10%', '10%-20%', '20%-30%', '30%-40%', '40%-50%', '50%-60%', '60%-70%', '70%-80%', '80%-90%', '90%-100%'],
-          axisLabel:{
-    		interval: 0
-    	    }
-        },
-        yAxis: {
-          type: 'value'
-        },
-        series: [
-          {
-            name: 'zkSync Era',
-            data: [zksProgressIntervalCounts['0-10'], zksProgressIntervalCounts['10-20'], zksProgressIntervalCounts['20-30'], zksProgressIntervalCounts['30-40'], zksProgressIntervalCounts['40-50'], zksProgressIntervalCounts['50-60'], zksProgressIntervalCounts['60-70'], zksProgressIntervalCounts['70-80'], zksProgressIntervalCounts['80-90'], zksProgressIntervalCounts['90-100']],
-            type: 'bar'
-          },
-          {
-            name: 'StarkNet',
-            data: [starkProgressIntervalCounts['0-10'], starkProgressIntervalCounts['10-20'], starkProgressIntervalCounts['20-30'], starkProgressIntervalCounts['30-40'], starkProgressIntervalCounts['40-50'], starkProgressIntervalCounts['50-60'], starkProgressIntervalCounts['60-70'], starkProgressIntervalCounts['70-80'], starkProgressIntervalCounts['80-90'], starkProgressIntervalCounts['90-100']],
-            type: 'bar'
-          },
-          {
-            name: 'Linea',
-            data: [lineaProgressIntervalCounts['0-10'], lineaProgressIntervalCounts['10-20'], lineaProgressIntervalCounts['20-30'], lineaProgressIntervalCounts['30-40'], lineaProgressIntervalCounts['40-50'], lineaProgressIntervalCounts['50-60'], lineaProgressIntervalCounts['60-70'], lineaProgressIntervalCounts['70-80'], lineaProgressIntervalCounts['80-90'], lineaProgressIntervalCounts['90-100']],
-            type: 'bar'
-          }
-        ]
-      };
-
-    const zksTx = zksAddressList.reduce((acc, entry) => {
-        if ('zks2_tx_amount' in entry) {
-            if (typeof entry.zks2_tx_amount === 'number') {
-                acc.push(entry.zks2_tx_amount);
-            }
+    const baseProgress = baseAddressList.reduce((acc, entry) => {
+        console.log("basep=",entry['progress'])
+        if ('progress' in entry) {
+            acc.push(entry.progress);
         }
         return acc;
     }, []);
-    const zksTxIntervalCounts = zksTx.reduce((acc, num) => {
+    const baseProgressIntervalCounts = baseProgress.reduce((acc, num) => {
         if (num >= 0 && num <= 10) {
             acc['0-10']++;
         } else if (num > 10 && num <= 20) {
@@ -551,8 +397,6 @@ const Overview = () => {
             acc['80-90']++;
         } else if (num > 90 && num <= 100) {
             acc['90-100']++;
-        } else if (num > 100) {
-            acc['100+']++;
         }
         return acc;
       }, {
@@ -565,18 +409,62 @@ const Overview = () => {
         '60-70': 0,
         '70-80': 0,
         '80-90': 0,
-        '90-100': 0,
-        '100+': 0
+        '90-100': 0
       });
-    const starkTx = starkAddressList.reduce((acc, entry) => {
-        if ('stark_tx_amount' in entry) {
-            if (typeof entry.stark_tx_amount === 'number') {
-                acc.push(entry.stark_tx_amount);
+    const progressOption = {
+        title: {
+            text: '任务进度分布',
+            subtext: `zkSyncEra平均完成率 ${parseInt(zksProgress.reduce((acc, num) => acc + (isNaN(parseFloat(num)) ? 0 : parseFloat(num)), 0) / (zksProgress.length || 1))}% Linea平均完成率 ${parseInt(lineaProgress.reduce((acc, num) => acc + (isNaN(parseFloat(num)) ? 0 : parseFloat(num)), 0) / (lineaProgress.length || 1))}% Base平均完成率 ${parseInt(baseProgress.reduce((acc, num) => acc + (isNaN(parseFloat(num)) ? 0 : parseFloat(num)), 0) / (baseProgress.length || 1))}%`,
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c}"
+        },
+        legend: {
+            top: '1%',
+            orient: 'vertical',
+            left: 'left',
+            data: ['zkSync Era', 'Linea', 'Base']
+        },
+        xAxis: {
+          type: 'category',
+          data: ['0-10%', '10%-20%', '20%-30%', '30%-40%', '40%-50%', '50%-60%', '60%-70%', '70%-80%', '80%-90%', '90%-100%'],
+          axisLabel:{
+    		interval: 0
+    	    }
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            name: 'zkSync Era',
+            data: [zksProgressIntervalCounts['0-10'], zksProgressIntervalCounts['10-20'], zksProgressIntervalCounts['20-30'], zksProgressIntervalCounts['30-40'], zksProgressIntervalCounts['40-50'], zksProgressIntervalCounts['50-60'], zksProgressIntervalCounts['60-70'], zksProgressIntervalCounts['70-80'], zksProgressIntervalCounts['80-90'], zksProgressIntervalCounts['90-100']],
+            type: 'bar'
+          },
+          {
+            name: 'Linea',
+            data: [lineaProgressIntervalCounts['0-10'], lineaProgressIntervalCounts['10-20'], lineaProgressIntervalCounts['20-30'], lineaProgressIntervalCounts['30-40'], lineaProgressIntervalCounts['40-50'], lineaProgressIntervalCounts['50-60'], lineaProgressIntervalCounts['60-70'], lineaProgressIntervalCounts['70-80'], lineaProgressIntervalCounts['80-90'], lineaProgressIntervalCounts['90-100']],
+            type: 'bar'
+          },
+          {
+            name: 'Base',
+            data: [baseProgressIntervalCounts['0-10'], baseProgressIntervalCounts['10-20'], baseProgressIntervalCounts['20-30'], baseProgressIntervalCounts['30-40'], baseProgressIntervalCounts['40-50'], baseProgressIntervalCounts['50-60'], baseProgressIntervalCounts['60-70'], baseProgressIntervalCounts['70-80'], baseProgressIntervalCounts['80-90'], baseProgressIntervalCounts['90-100']],
+            type: 'bar'
+          }
+        ]
+      };
+
+    const zksTx = zksAddressList.reduce((acc, entry) => {
+        if ('zks2_tx_amount' in entry) {
+            if (typeof entry.zks2_tx_amount === 'number') {
+                acc.push(entry.zks2_tx_amount);
             }
         }
         return acc;
     }, []);
-    const starkTxIntervalCounts = starkTx.reduce((acc, num) => {
+    const zksTxIntervalCounts = zksTx.reduce((acc, num) => {
         if (num >= 0 && num <= 10) {
             acc['0-10']++;
         } else if (num > 10 && num <= 20) {
@@ -660,10 +548,43 @@ const Overview = () => {
         '90-100': 0,
         '100+': 0
       });
+    
+    const baseTx = baseAddressList.reduce((acc, entry) => {
+        if ('base_tx_amount' in entry) {
+            if (typeof entry.base_tx_amount === 'number') {
+                acc.push(entry.base_tx_amount);
+            }
+        }
+        return acc;
+    }, []);
+    const baseTxIntervalCounts = baseTx.reduce((acc, num) => {
+        if (num >= 0 && num <= 10) {
+            acc['0-10']++;
+        } else if (num > 10 && num <= 20) {
+            acc['10-20']++;
+        } else if (num > 20 && num <= 30) {
+            acc['20-30']++;
+        } else if (num > 30 && num <= 40) {
+            acc['30-40']++;
+        } else if (num > 40 && num <= 50) {
+            acc['40-50']++;
+        } else if (num > 50) {
+            acc['50+']++;
+        }
+        return acc;
+    }, {
+        '0-10': 0,
+        '10-20': 0,
+        '20-30': 0,
+        '30-40': 0,
+        '40-50': 0,
+        '50+': 0
+    });
+
     const txOption = {
         title: {
             text: 'Tx数分布',
-            subtext: `zkSyncEra平均tx ${parseInt(zksTx.reduce((acc, num) => acc + num, 0) / zksTx.length)}条  StarkNet平均tx ${parseInt(starkTx.reduce((acc, num) => acc + num, 0) / starkTx.length)}条 Linea平均tx ${parseInt(lineaTx.reduce((acc, num) => acc + num, 0) / lineaTx.length)}条`,
+            subtext: `zkSyncEra平均tx ${parseInt(zksTx.length ? zksTx.reduce((acc, num) => acc + num, 0) / zksTx.length : 0)}条  Linea平均tx ${parseInt(lineaTx.length ? lineaTx.reduce((acc, num) => acc + num, 0) / lineaTx.length : 0)}条 Base平均tx ${parseInt(baseTx.length ? baseTx.reduce((acc, num) => acc + num, 0) / baseTx.length : 0)}条`,
             left: 'center'
         },
         tooltip: {
@@ -674,7 +595,7 @@ const Overview = () => {
             top: '1%',
             orient: 'vertical',
             left: 'left',
-            data: ['zkSync Era', 'StarkNet', 'Linea']
+            data: ['zkSync Era', 'Linea', 'Base']
         },
         xAxis: {
           type: 'category',
@@ -693,13 +614,13 @@ const Overview = () => {
             type: 'bar'
           },
           {
-            name: 'StarkNet',
-            data: [starkTxIntervalCounts['0-10'], starkTxIntervalCounts['10-20'], starkTxIntervalCounts['20-30'], starkTxIntervalCounts['30-40'], starkTxIntervalCounts['40-50'], starkTxIntervalCounts['50-60'], starkTxIntervalCounts['60-70'], starkTxIntervalCounts['70-80'], starkTxIntervalCounts['80-90'], starkTxIntervalCounts['90-100'], starkTxIntervalCounts['100+']],
+            name: 'Linea',
+            data: [lineaTxIntervalCounts['0-10'], lineaTxIntervalCounts['10-20'], lineaTxIntervalCounts['20-30'], lineaTxIntervalCounts['30-40'], lineaTxIntervalCounts['40-50'], lineaTxIntervalCounts['50-60'], lineaTxIntervalCounts['60-70'], lineaTxIntervalCounts['70-80'], lineaTxIntervalCounts['80-90'], lineaTxIntervalCounts['90-100'], lineaTxIntervalCounts['100+']],
             type: 'bar'
           },
           {
-            name: 'Linea',
-            data: [lineaTxIntervalCounts['0-10'], lineaTxIntervalCounts['10-20'], lineaTxIntervalCounts['20-30'], lineaTxIntervalCounts['30-40'], lineaTxIntervalCounts['40-50'], lineaTxIntervalCounts['50-60'], lineaTxIntervalCounts['60-70'], lineaTxIntervalCounts['70-80'], lineaTxIntervalCounts['80-90'], lineaTxIntervalCounts['90-100'], lineaTxIntervalCounts['100+']],
+            name: 'Base',
+            data: [baseTxIntervalCounts['0-10'], baseTxIntervalCounts['10-20'], baseTxIntervalCounts['20-30'], baseTxIntervalCounts['30-40'], baseTxIntervalCounts['40-50'], baseTxIntervalCounts['50-60'], baseTxIntervalCounts['60-70'], baseTxIntervalCounts['70-80'], baseTxIntervalCounts['80-90'], baseTxIntervalCounts['90-100'], baseTxIntervalCounts['100+']],
             type: 'bar'
           }
         ]
@@ -735,37 +656,6 @@ const Overview = () => {
         '40-50': 0,
         '50+': 0
       });
-    const starkDayActivity = starkAddressList.reduce((acc, entry) => {
-        if ('dayActivity' in entry) {
-            if (typeof entry.dayActivity === 'number') {
-                acc.push(entry.dayActivity);
-            }
-        }
-        return acc;
-    }, []);
-    const starkActivityIntervalCounts = starkDayActivity.reduce((acc, num) => {
-        if (num >= 0 && num <= 10) {
-            acc['0-10']++;
-        } else if (num > 10 && num <= 20) {
-            acc['10-20']++;
-        } else if (num > 20 && num <= 30) {
-            acc['20-30']++;
-        } else if (num > 30 && num <= 40) {
-            acc['30-40']++;
-        } else if (num > 40 && num <= 50) {
-            acc['40-50']++;
-        } else if (num > 50) {
-            acc['50+']++;
-        }
-        return acc;
-      }, {
-        '0-10': 0,
-        '10-20': 0,
-        '20-30': 0,
-        '30-40': 0,
-        '40-50': 0,
-        '50+': 0,
-      });
     const lineaDayActivity = lineaAddressList.reduce((acc, entry) => {
         if ('dayActivity' in entry) {
             if (typeof entry.dayActivity === 'number') {
@@ -797,10 +687,41 @@ const Overview = () => {
         '40-50': 0,
         '50+': 0,
       });
+    const baseDayActivity = baseAddressList.reduce((acc, entry) => {
+        if ('dayActivity' in entry) {
+            if (typeof entry.dayActivity === 'number') {
+                acc.push(entry.dayActivity);
+            }
+        }
+        return acc;
+    }, []);
+    const baseActivityIntervalCounts = baseDayActivity.reduce((acc, num) => {
+        if (num >= 0 && num <= 10) {
+            acc['0-10']++;
+        } else if (num > 10 && num <= 20) {
+            acc['10-20']++;
+        } else if (num > 20 && num <= 30) {
+            acc['20-30']++;
+        } else if (num > 30 && num <= 40) {
+            acc['30-40']++;
+        } else if (num > 40 && num <= 50) {
+            acc['40-50']++;
+        } else if (num > 50) {
+            acc['50+']++;
+        }
+        return acc;
+    }, {
+        '0-10': 0,
+        '10-20': 0,
+        '20-30': 0,
+        '30-40': 0,
+        '40-50': 0,
+        '50+': 0
+    });
     const dayActivityOption = {
         title: {
             text: '日活跃天数分布',
-            subtext: `zkSyncEra平均日活 ${parseInt(zksDayActivity.reduce((acc, num) => acc + num, 0) / zksDayActivity.length)}天  StarkNet平均日活 ${parseInt(starkDayActivity.reduce((acc, num) => acc + num, 0) / starkDayActivity.length)}天 Linea平均日活 ${parseInt(lineaDayActivity.reduce((acc, num) => acc + num, 0) / lineaDayActivity.length)}天`,
+            subtext: `zkSyncEra平均日活 ${parseInt(zksDayActivity.reduce((acc, num) => acc + num, 0) / zksDayActivity.length)}天  Linea平均日活 ${parseInt(lineaDayActivity.reduce((acc, num) => acc + num, 0) / lineaDayActivity.length)}天 Base平均日活 ${parseInt(baseDayActivity.reduce((acc, num) => acc + num, 0) / baseDayActivity.length)}天`,
             left: 'center'
         },
         tooltip: {
@@ -811,7 +732,7 @@ const Overview = () => {
             top: '1%',
             orient: 'vertical',
             left: 'left',
-            data: ['zkSync Era', 'StarkNet', 'Linea']
+            data: ['zkSync Era', 'Linea', 'Base']
         },
         xAxis: {
           type: 'category',
@@ -830,13 +751,13 @@ const Overview = () => {
             type: 'bar'
           },
           {
-            name: 'StarkNet',
-            data: [starkActivityIntervalCounts['0-10'], starkActivityIntervalCounts['10-20'], starkActivityIntervalCounts['20-30'], starkActivityIntervalCounts['30-40'], starkActivityIntervalCounts['40-50'], starkActivityIntervalCounts['50+']],
+            name: 'Linea',
+            data: [lineaActivityIntervalCounts['0-10'], lineaActivityIntervalCounts['10-20'], lineaActivityIntervalCounts['20-30'], lineaActivityIntervalCounts['30-40'], lineaActivityIntervalCounts['40-50'], lineaActivityIntervalCounts['50+']],
             type: 'bar'
           },
           {
-            name: 'Linea',
-            data: [lineaActivityIntervalCounts['0-10'], lineaActivityIntervalCounts['10-20'], lineaActivityIntervalCounts['20-30'], lineaActivityIntervalCounts['30-40'], lineaActivityIntervalCounts['40-50'], lineaActivityIntervalCounts['50+']],
+            name: 'Base',
+            data: [baseActivityIntervalCounts['0-10'], baseActivityIntervalCounts['10-20'], baseActivityIntervalCounts['20-30'], baseActivityIntervalCounts['30-40'], baseActivityIntervalCounts['40-50'], baseActivityIntervalCounts['50+']],
             type: 'bar'
           }
         ]
@@ -867,32 +788,6 @@ const Overview = () => {
         '5w-25w': 0,
         '25w+': 0
       });
-    const starkExchangeAmount = starkAddressList.reduce((acc, entry) => {
-        if ('stark_exchange_amount' in entry) {
-            acc.push(entry.stark_exchange_amount);
-        }
-        return acc;
-    }, []);
-    const starkExchangeAmountIntervalCounts = starkExchangeAmount.reduce((acc, num) => {
-        if (num >= 0 && num <= 1000) {
-            acc['0-1k']++;
-        } else if (num > 1000 && num <= 10000) {
-            acc['1k-1w']++;
-        } else if (num > 10000 && num <= 50000) {
-            acc['1w-5w']++;
-        } else if (num > 50000 && num <= 250000) {
-            acc['5w-25w']++;
-        } else if (num > 250000) {
-            acc['25w+']++;
-        }
-        return acc;
-      }, {
-        '0-1k': 0,
-        '1k-1w': 0,
-        '1w-5w': 0,
-        '5w-25w': 0,
-        '25w+': 0
-    });
     const lineaExchangeAmount = lineaAddressList.reduce((acc, entry) => {
         if ('totalExchangeAmount' in entry) {
             acc.push(entry.totalExchangeAmount);
@@ -919,10 +814,36 @@ const Overview = () => {
         '5w-25w': 0,
         '25w+': 0
     });
+    const baseExchangeAmount = baseAddressList.reduce((acc, entry) => {
+        if ('totalExchangeAmount' in entry) {
+            acc.push(entry.totalExchangeAmount);
+        }
+        return acc;
+    }, []);
+    const baseExchangeAmountIntervalCounts = baseExchangeAmount.reduce((acc, num) => {
+        if (num >= 0 && num <= 1000) {
+            acc['0-1k']++;
+        } else if (num > 1000 && num <= 10000) {
+            acc['1k-1w']++;
+        } else if (num > 10000 && num <= 50000) {
+            acc['1w-5w']++;
+        } else if (num > 50000 && num <= 250000) {
+            acc['5w-25w']++;
+        } else if (num > 250000) {
+            acc['25w+']++;
+        }
+        return acc;
+    }, {
+        '0-1k': 0,
+        '1k-1w': 0,
+        '1w-5w': 0,
+        '5w-25w': 0,
+        '25w+': 0
+    });
     const exchangeAmountOption = {
         title: {
             text: '交易额分布',
-            subtext: `zkSyncEra平均交易额 ${parseInt(zksExchangeAmount.reduce((acc, num) => acc + parseInt(num), 0) / zksExchangeAmount.length)}u  StarkNet平均交易额 ${parseInt(starkExchangeAmount.reduce((acc, num) => acc + parseInt(num), 0) / starkExchangeAmount.length)}u Linea平均交易额 ${parseInt(lineaExchangeAmount.reduce((acc, num) => acc + parseInt(num), 0) / lineaExchangeAmount.length)}u`,
+            subtext: `zkSyncEra平均交易额 ${parseInt(zksExchangeAmount.reduce((acc, num) => acc + parseInt(num), 0) / zksExchangeAmount.length)}u  Linea平均交易额 ${parseInt(lineaExchangeAmount.reduce((acc, num) => acc + parseInt(num), 0) / lineaExchangeAmount.length)}u Base平均交易额 ${parseInt(baseExchangeAmount.reduce((acc, num) => acc + parseInt(num), 0) / baseExchangeAmount.length)}u`,
             left: 'center'
         },
         tooltip: {
@@ -933,7 +854,7 @@ const Overview = () => {
             top: '1%',
             orient: 'vertical',
             left: 'left',
-            data: ['zkSync Era', 'StarkNet', 'Linea']
+            data: ['zkSync Era', 'Linea', 'Base']
         },
         xAxis: {
           type: 'category',
@@ -952,13 +873,13 @@ const Overview = () => {
             type: 'bar'
           },
           {
-            name: 'StarkNet',
-            data: [starkExchangeAmountIntervalCounts['0-1k'], starkExchangeAmountIntervalCounts['1k-1w'], starkExchangeAmountIntervalCounts['1w-5w'], starkExchangeAmountIntervalCounts['5w-25w'], starkExchangeAmountIntervalCounts['25w+']],
+            name: 'Linea',
+            data: [lineaExchangeAmountIntervalCounts['0-1k'], lineaExchangeAmountIntervalCounts['1k-1w'], lineaExchangeAmountIntervalCounts['1w-5w'], lineaExchangeAmountIntervalCounts['5w-25w'], lineaExchangeAmountIntervalCounts['25w+']],
             type: 'bar'
           },
           {
-            name: 'Linea',
-            data: [lineaExchangeAmountIntervalCounts['0-1k'], lineaExchangeAmountIntervalCounts['1k-1w'], lineaExchangeAmountIntervalCounts['1w-5w'], lineaExchangeAmountIntervalCounts['5w-25w'], lineaExchangeAmountIntervalCounts['25w+']],
+            name: 'Base',
+            data: [baseExchangeAmountIntervalCounts['0-1k'], baseExchangeAmountIntervalCounts['1k-1w'], baseExchangeAmountIntervalCounts['1w-5w'], baseExchangeAmountIntervalCounts['5w-25w'], baseExchangeAmountIntervalCounts['25w+']],
             type: 'bar'
           }
         ]
@@ -986,17 +907,16 @@ const Overview = () => {
     }
 
     const zksTimestampsList = localStorage.getItem('zks_timestamps') ? JSON.parse(localStorage.getItem('zks_timestamps')) : [];
-    const starkTimestampsList = localStorage.getItem('stark_timestamps') ? JSON.parse(localStorage.getItem('stark_timestamps')) : [];
     const lineaTimestampsList = localStorage.getItem('linea_timestamps') ? JSON.parse(localStorage.getItem('linea_timestamps')) : [];
     const baseTimestampsList = localStorage.getItem('base_timestamps') ? JSON.parse(localStorage.getItem('base_timestamps')) : [];
-    const allTimestamps = zksTimestampsList.concat(starkTimestampsList).concat(lineaTimestampsList).concat(baseTimestampsList);
+    const allTimestamps = zksTimestampsList.concat(lineaTimestampsList).concat(baseTimestampsList);
 
     const timeOption2023 = {
         title: {
             top: 30,
             left: 'center',
             // text: '黑奴工作量证明 (Proof of Gas)',
-            // subtext: `2023年 日均交互次数 ${parseFloat(allTimestamps.length/365).toFixed(2) * accountCount}   zkSync Era ${(parseFloat(zksTimestampsList.length/365) * zksAddressCount).toFixed(2)} StarkNet ${parseInt(starkTimestampsList.length/365) * starkAddressCount} Linea ${parseInt(lineaTimestampsList.length/365)  * lineaAddressCount} Base ${parseInt(baseTimestampsList.length/365) * baseAddressCount}`,
+            // subtext: `2023年 日均交互次数 ${parseFloat(allTimestamps.length/365).toFixed(2) * accountCount}   zkSync Era ${(parseFloat(zksTimestampsList.length/365) * zksAddressCount).toFixed(2)} Linea ${parseInt(lineaTimestampsList.length/365)  * lineaAddressCount} Base ${parseInt(baseTimestampsList.length/365) * baseAddressCount}`,
         },
         tooltip: {
             position: 'top',
@@ -1056,7 +976,7 @@ const Overview = () => {
             top: 30,
             left: 'center',
             text: '黑奴工作量证明 (Proof of Gas)',
-            // subtext: `2024年 日均交互次数 ${parseInt(allTimestamps.length/365)}   zkSync Era ${parseInt(zksTimestampsList.length/365)} StarkNet ${parseInt(starkTimestampsList.length/365)} Linea ${parseInt(lineaTimestampsList.length/365)} Base ${parseInt(baseTimestampsList.length/365)}`,
+            // subtext: `2024年 日均交互次数 ${parseInt(allTimestamps.length/365)}   zkSync Era ${parseInt(zksTimestampsList.length/365)} Linea ${parseInt(lineaTimestampsList.length/365)} Base ${parseInt(baseTimestampsList.length/365)}`,
         },
         tooltip: {
             position: 'top',
