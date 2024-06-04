@@ -21,7 +21,8 @@ import {
     exportToExcel,
     calculateScore,
     getDebankValue,
-    checkSybil
+    checkSybil,
+    getZkSyncAirdrop,
 } from "@utils"
 import {useEffect, useState} from "react";
 import './index.css';
@@ -220,13 +221,14 @@ function Zksync() {
                     return item;
                 }));
                 const updatedData = [...data];
-                getZksEra(values.address).then(({balance2, tx2, usdcBalance, eraETH}) => {
+                getZksEra(values.address).then(({balance2, tx2, usdcBalance, eraETH, ZK}) => {
                     updatedData[index] = {
                         ...updatedData[index],
                         zks2_balance: balance2,
                         zks2_tx_amount: tx2,
                         zks2_usdcBalance: usdcBalance,
                         zks_eraETH: eraETH,
+                        ZK_balance: ZK,
                     };
                     setData(updatedData);
                     localStorage.setItem('addresses', JSON.stringify(data));
@@ -301,6 +303,7 @@ function Zksync() {
                     zks2_tx_amount: null,
                     zks2_usdcBalance: null,
                     zks_eraETH: null,
+                    ZK_balance: null,
                     zks2_last_tx: null,
                     zks1_balance: null,
                     zks1_tx_amount: null,
@@ -318,11 +321,12 @@ function Zksync() {
                 };
                 const newData = [...data, newEntry];
                 setData(newData);
-                getZksEra(values.address).then(({balance2, tx2, usdcBalance, eraETH}) => {
+                getZksEra(values.address).then(({balance2, tx2, usdcBalance, eraETH, ZK}) => {
                     newEntry.zks2_balance = balance2;
                     newEntry.zks2_tx_amount = tx2;
                     newEntry.zks2_usdcBalance = usdcBalance;
                     newEntry.zks_eraETH = eraETH;
+                    newEntry.ZK_balance = ZK;
                     setData([...newData]);
                     localStorage.setItem('addresses', JSON.stringify(newData));
                 })
@@ -416,6 +420,39 @@ function Zksync() {
             setSelectedKeys([]);
         }
     };
+    const handleAirdrop = async () => {
+        if (!selectedKeys.length) {
+            notification.error({
+                message: "错误",
+                description: "请先选择要查询的地址",
+            }, 2);
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const newData = [...data];
+            for (let key of selectedKeys) {
+                const index = newData.findIndex(item => item.key === key);
+                if (index !== -1) {
+                    const item = newData[index];
+                    item.zksync_airdrop = false;
+                    setData([...newData]);
+                    const { airdrop } = await getZkSyncAirdrop(item.address);
+                    item.zksync_airdrop = airdrop;
+                    setData([...newData]);
+                    localStorage.setItem('addresses', JSON.stringify(data));
+                }
+            }
+        } catch (error) {
+            notification.error({
+                message: "错误",
+                description: error.message,
+            }, 2);
+        } finally {
+            setIsLoading(false);
+            setSelectedKeys([]);
+        }
+    };
     const handleRefresh = async () => {
         if (!selectedKeys.length) {
             notification.error({
@@ -458,11 +495,13 @@ function Zksync() {
                         item.zks2_tx_amount = null;
                         item.zks2_usdcBalance = null;
                         item.zks_eraETH = null;
-                        return getZksEra(item.address).then(({balance2, tx2, usdcBalance, eraETH}) => {
+                        item.ZK_balance = null;
+                        return getZksEra(item.address).then(({balance2, tx2, usdcBalance, eraETH, ZK}) => {
                             item.zks2_balance = balance2;
                             item.zks2_tx_amount = tx2;
                             item.zks2_usdcBalance = usdcBalance;
                             item.zks_eraETH = eraETH;
+                            item.ZK_balance = ZK;
                             setData([...newData]);
                             localStorage.setItem('addresses', JSON.stringify(newData));
                         })
@@ -619,6 +658,7 @@ function Zksync() {
                     zks2_tx_amount: null,
                     zks2_usdcBalance: null,
                     zks_eraETH: null,
+                    ZK_balance: null,
                     zks1_balance: null,
                     zks1_tx_amount: null,
                     zks2_last_tx: null,
@@ -637,11 +677,12 @@ function Zksync() {
                 if (index === -1) {
                     newData.push(item);
                 }
-                promisesQueue.push(() => getZksEra(address).then(({balance2, tx2, usdcBalance, eraETH}) => {
+                promisesQueue.push(() => getZksEra(address).then(({balance2, tx2, usdcBalance, eraETH, ZK}) => {
                     item.zks2_balance = balance2;
                     item.zks2_tx_amount = tx2;
                     item.zks2_usdcBalance = usdcBalance;
                     item.zks_eraETH = eraETH;
+                    item.ZK_balance = ZK;
                 }));
 
 
@@ -928,14 +969,14 @@ function Zksync() {
                     render: (text, record) => (text === null ? <Spin/> : text),
                     width: 60
                 },
-                // {
-                //     title: "eraETH",
-                //     dataIndex: "zks_eraETH",
-                //     key: "zks_eraETH",
-                //     align: "center",
-                //     render: (text, record) => (text === null ? <Spin/> : text),
-                //     width: 60
-                // },
+                {
+                    title: "ZK",
+                    dataIndex: "ZK_balance",
+                    key: "ZK_balance",
+                    align: "center",
+                    render: (text, record) => (text === null ? <Spin/> : text),
+                    width: 60
+                },
                 {
                     title: 'Tx',
                     dataIndex: 'zks2_tx_amount',
@@ -1002,19 +1043,19 @@ function Zksync() {
                       },
                     width: 70
                 },
-                {
-                    title: <a href="https://docs.zksync.io/build/developer-reference/account-abstraction.html#paymasters"
-                        target="_blank" rel="noopener noreferrer">Paymaster</a>,
-                    dataIndex: "paymasterCount",
-                    key: "paymasterCount",
-                    align: "center",
-                    render: (text, record) => (
-                        <span style={{ color: text === 0 ? 'red' : 'inherit' }}>
-                            {text === null ? <Spin /> : text}
-                        </span>
-                        ),
-                    width: 60
-                },
+                // {
+                //     title: <a href="https://docs.zksync.io/build/developer-reference/account-abstraction.html#paymasters"
+                //         target="_blank" rel="noopener noreferrer">Paymaster</a>,
+                //     dataIndex: "paymasterCount",
+                //     key: "paymasterCount",
+                //     align: "center",
+                //     render: (text, record) => (
+                //         <span style={{ color: text === 0 ? 'red' : 'inherit' }}>
+                //             {text === null ? <Spin /> : text}
+                //         </span>
+                //         ),
+                //     width: 60
+                // },
                 {
                     title: "官方桥跨链Tx数",
                     key: "cross_chain_tx_count_group",
@@ -1091,12 +1132,12 @@ function Zksync() {
                             width: 34
                         },
                         {
-                            title: "不同合约",
+                            title: "合约数",
                             dataIndex: "contractActivity",
                             key: "contractActivity",
                             align: "center",
                             render: (text, record) => (text === null ? <Spin/> : text),
-                            width: 70
+                            width: 50
                         },
                         {
                             title: "金额(U)",
@@ -1149,43 +1190,52 @@ function Zksync() {
             ],
         },
         {
-            title: "评分",
-            dataIndex: "zk_score",
-            key: "zk_score",
+            title: "空投数量",
+            key: "zksync_airdrop",
+            dataIndex: "zksync_airdrop",
             align: "center",
-            sorter: (a, b) => a.zk_score - b.zk_score,
-            render: (text, record) => {
-                if (text === null) {
-                  return <Spin />;
-                }
-          
-                // 计算对数值
-                const logarithmValue = Math.log(text); // 使用自然对数（以e为底）
-                // const logarithmValue = Math.log10(text); // 使用常用对数（以10为底）
-          
-                // 归一化处理
-                const minValue = Math.log(1); // 最小值的对数
-                const maxValue = Math.log(100); // 最大值的对数
-                const normalizedValue = (logarithmValue - minValue) / (maxValue - minValue);
-          
-                // 计算透明度
-                const minOpacity = 0.1; // 最小透明度
-                const maxOpacity = 1; // 最大透明度
-                const opacity = normalizedValue * (maxOpacity - minOpacity) + minOpacity;
-          
-                const backgroundColor = `rgba(240, 121, 78, ${opacity})`; 
-          
-                return {
-                  children: text,
-                  props: {
-                    style: {
-                      background: backgroundColor,
-                    },
-                  },
-                };
-              },
+            render: (text, record) => text === null ? <Spin /> : text,
+            sorter: (a, b) => a.zksync_airdrop - b.zksync_airdrop,
             width: 50
         },
+        // {
+        //     title: "评分",
+        //     dataIndex: "zk_score",
+        //     key: "zk_score",
+        //     align: "center",
+        //     sorter: (a, b) => a.zk_score - b.zk_score,
+        //     render: (text, record) => {
+        //         if (text === null) {
+        //           return <Spin />;
+        //         }
+          
+        //         // 计算对数值
+        //         const logarithmValue = Math.log(text); // 使用自然对数（以e为底）
+        //         // const logarithmValue = Math.log10(text); // 使用常用对数（以10为底）
+          
+        //         // 归一化处理
+        //         const minValue = Math.log(1); // 最小值的对数
+        //         const maxValue = Math.log(100); // 最大值的对数
+        //         const normalizedValue = (logarithmValue - minValue) / (maxValue - minValue);
+          
+        //         // 计算透明度
+        //         const minOpacity = 0.1; // 最小透明度
+        //         const maxOpacity = 1; // 最大透明度
+        //         const opacity = normalizedValue * (maxOpacity - minOpacity) + minOpacity;
+          
+        //         const backgroundColor = `rgba(240, 121, 78, ${opacity})`; 
+          
+        //         return {
+        //           children: text,
+        //           props: {
+        //             style: {
+        //               background: backgroundColor,
+        //             },
+        //           },
+        //         };
+        //       },
+        //     width: 50
+        // },
         {
             title: "操作",
             key: "action",
@@ -1337,7 +1387,7 @@ function Zksync() {
                             let zks1Balance = 0;
                             let zks2Balance = 0;
                             let zks2UsdcBalance = 0;
-                            let zksEraETH = 0;
+                            let zkBalance = 0;
                             let totalFees = 0;
                             let avgTx = 0;
                             let avgDay = 0;
@@ -1346,12 +1396,13 @@ function Zksync() {
                             let avgContract = 0;
                             let avgAmount = 0;
                             let avgScore = 0;
+                            let totalZksyncAirdrop = 0;
                             pageData.forEach(({
                                 eth_balance,
                                 zks1_balance,
                                 zks2_balance,
                                 zks2_usdcBalance,
-                                zks_eraETH,
+                                ZK_balance,
                                 zks2_tx_amount,
                                 totalFee,
                                 dayActivity,
@@ -1359,13 +1410,14 @@ function Zksync() {
                                 monthActivity,
                                 contractActivity,
                                 totalExchangeAmount,
-                                zk_score
+                                zk_score,
+                                zksync_airdrop,
                             }) => {
                                 ethBalance += Number(eth_balance);
                                 zks1Balance += Number(zks1_balance);
                                 zks2Balance += Number(zks2_balance);
                                 zks2UsdcBalance += Number(zks2_usdcBalance);
-                                zksEraETH += Number(zks_eraETH);
+                                zkBalance += Number(ZK_balance);
                                 totalFees += Number(totalFee);
                                 avgTx += Number(zks2_tx_amount);
                                 avgDay += Number(dayActivity);
@@ -1374,6 +1426,7 @@ function Zksync() {
                                 avgContract += Number(contractActivity);
                                 avgAmount += Number(totalExchangeAmount);
                                 avgScore += Number(zk_score);
+                                totalZksyncAirdrop += Number(zksync_airdrop);
                             })
                             avgTx = avgTx / pageData.length;
                             avgDay = avgDay / pageData.length;
@@ -1382,7 +1435,7 @@ function Zksync() {
                             avgContract = avgContract / pageData.length;
                             avgAmount = avgAmount / pageData.length;
                             avgScore = avgScore / pageData.length;
-                            const emptyCells = Array(6).fill().map((_, index) => <Table.Summary.Cell key={index} index={index + 11}/>);
+                            const emptyCells = Array(5).fill().map((_, index) => <Table.Summary.Cell key={index} index={index + 11}/>);
 
                             return (
                                 <>
@@ -1394,7 +1447,7 @@ function Zksync() {
                                         <Table.Summary.Cell index={7}/>
                                         <Table.Summary.Cell index={8}>{zks2Balance.toFixed(4)}</Table.Summary.Cell>
                                         <Table.Summary.Cell index={9}>{zks2UsdcBalance.toFixed(2)}</Table.Summary.Cell>
-                                        {/* <Table.Summary.Cell index={10}>{zksEraETH.toFixed(4)}</Table.Summary.Cell> */}
+                                        <Table.Summary.Cell index={10}>{zkBalance.toFixed(4)}</Table.Summary.Cell>
                                         <Table.Summary.Cell index={11}>-{avgTx.toFixed(0)}-</Table.Summary.Cell>
                                         {emptyCells}
                                         <Table.Summary.Cell index={17}>-{avgDay.toFixed(0)}-</Table.Summary.Cell>
@@ -1403,7 +1456,7 @@ function Zksync() {
                                         <Table.Summary.Cell index={20}>-{avgContract.toFixed(0)}-</Table.Summary.Cell>
                                         <Table.Summary.Cell index={21}>-{avgAmount.toFixed(0)}-</Table.Summary.Cell>
                                         <Table.Summary.Cell index={22}>{totalFees.toFixed(4)}</Table.Summary.Cell>
-                                        <Table.Summary.Cell index={23}>-{avgScore.toFixed(0)}-</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={23}>{totalZksyncAirdrop.toFixed(0)}</Table.Summary.Cell>
                                         <Table.Summary.Cell index={24}/>
                                     </Table.Summary.Row>
                                 </>
@@ -1422,10 +1475,15 @@ function Zksync() {
                                             style={{width: "15%"}} icon={<SyncOutlined/>}>
                                         {isLoading ? "正在刷新" : "刷新选中地址"}
                                     </Button>
-                                    <Button type="primary" danger onClick={handleCheck} loading={isLoading} size={"large"}
+                                    {/* <Button type="primary" danger onClick={handleCheck} loading={isLoading} size={"large"}
                                                 style={{width: "15%"}}
                                                 icon={<FileSearchOutlined />}>
                                             查询女巫(非本地)
+                                    </Button> */}
+                                    <Button type="primary" onClick={handleAirdrop} loading={isLoading} size={"large"}
+                                                style={{width: "15%"}}
+                                                icon={<FileSearchOutlined />}>
+                                            查询空投
                                     </Button>
                                     <Button type="primary" onClick={showModal} size={"large"} style={{width: "20%"}}
                                             icon={<PlusOutlined/>}>

@@ -34,6 +34,7 @@ import getScrollBridge from "@utils/scroll/getScrollBridge.js";
 import getStarkId from "@utils/stark/getStarkId.js";
 import getStarkAirdrop from "@utils/stark/getStarkAirdrop.js";
 import checkSybil from "@utils/layer/checkSybil.js";
+import getZkSyncAirdrop from "@utils/zksync/getZkSyncAirdrop.js";
 export {
     getEthBalance,
     getTxCount,
@@ -71,4 +72,5 @@ export {
     getStarkId,
     getStarkAirdrop,
     checkSybil,
+    getZkSyncAirdrop
 };
