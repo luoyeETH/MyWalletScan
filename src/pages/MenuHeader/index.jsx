@@ -93,7 +93,7 @@ const MenuHeader = () => {
         },
         {
             label: <span>捐赠 / 已空投 <CaretDownOutlined /></span>,
-            key: 'donate',
+            key: 'donation',
             children: [
                 {
                     label: '捐赠',

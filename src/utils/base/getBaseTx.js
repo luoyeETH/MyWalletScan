@@ -18,6 +18,9 @@ function getMonthNumber(d) {
 }
 
 function getZkSyncLastTX(lastTxDatetime) {
+    if (lastTxDatetime === undefined) {
+        return "无交易"
+    }
     const date = new Date(lastTxDatetime);
     const offset = 8;
     const utc8Date = new Date(date.getTime() + offset * 3600 * 1000);

@@ -490,7 +490,7 @@ function Scroll() {
             },
             width: 90
         },
-        {
+{
             title: (
                 <span>
                 钱包地址
@@ -503,12 +503,47 @@ function Scroll() {
             key: "address",
             align: "center",
             render: (text, record) => {
+                const [ensData, setEnsData] = useState(null);
+
+                useEffect(() => {
+                    if (record.ens) {
+                        setEnsData(record.ens);
+                    } else {
+                        const fetchENS = async (address) => {
+                            try {
+                                const response = await fetch(`https://api.ensideas.com/ens/resolve/${address}`);
+                                const data = await response.json();
+                                setEnsData(data);
+                                if (data) {
+                                    record.ens = data;
+                                }
+                            } catch (error) {
+                                console.error("Error fetching ENS:", error);
+                                setEnsData(null);
+                            }
+                        };
+
+                        fetchENS(record.address);
+                    }
+                }, [record.address]);
+
                 if (hideColumn) {
                     return '***';
-                  }
-                return text;
+                }
+
+                const displayText = ensData ? ensData.displayName : text;
+
+                return (
+                    <span 
+                        title={record.address}
+                        onMouseEnter={(e) => e.target.innerHTML = `${displayText} (${record.address})`}
+                        onMouseLeave={(e) => e.target.innerHTML = displayText}
+                    >
+                        {displayText}
+                    </span>
+                );
             },
-            width: 360
+            width: 85
         },
         // {
         //     title: "余额",
