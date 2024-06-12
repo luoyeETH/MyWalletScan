@@ -170,6 +170,7 @@ function Zksync() {
     };
     }, []);
 
+
     useEffect(() => {
         setBatchProgress(0);
         const zksync_config = localStorage.getItem('zksync_config');
@@ -437,8 +438,8 @@ function Zksync() {
                     const item = newData[index];
                     item.zksync_airdrop = false;
                     setData([...newData]);
-                    const { airdrop } = await getZkSyncAirdrop(item.address);
-                    item.zksync_airdrop = airdrop;
+                    const  airdrop  = await getZkSyncAirdrop(item.address);
+                    item.zksync_airdrop = airdrop.amount;
                     setData([...newData]);
                     localStorage.setItem('addresses', JSON.stringify(data));
                 }
